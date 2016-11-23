@@ -1,0 +1,5 @@
+packages/
+UnitTests/bin/
+UnitTests/obj/
+CodeTranslator/obj/
+CodeTranslator/bin/
