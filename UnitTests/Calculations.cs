@@ -36,8 +36,18 @@ namespace UnitTests
         public void AlotOfBrackets()
         {
             var translator = new Translator();
-            translator.PrivateMethod("ParseOperation", "((12-43*(3-1)-10)-12)-34+34-(9/2)");
-            translator.PrivateMethod("ParseOperation", "((12-43*(3-1)-10)-12)-34+34-(8/2)");
+            Assert.AreEqual(
+                translator.PrivateMethod("ParseOperation", "((12-43*(3-1)-10)-12)-34+34-(9/2)"), "-100,5");
+            Assert.AreEqual(
+                translator.PrivateMethod("ParseOperation", "((12-43*(3-1)-10)-12)-34+34-(8/2)"), "-100");
+        }
+
+        [Test]
+        public void BooleanAlgebra()
+        {
+            var translator = new Translator();
+            Assert.AreEqual(translator.PrivateMethod("ParseOperation", "!1|0&(1|0)"), "0");
+            Assert.AreEqual(translator.PrivateMethod("ParseOperation", "(1&!0)|(0|!1)"), "1");
         }
     }
 }

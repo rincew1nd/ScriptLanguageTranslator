@@ -34,18 +34,20 @@ namespace CodeTranslator
         {
             _regexs = new Dictionary<string, Regex>()
             {
-                {"Числa", new Regex("^[0-9]+$")},
-                {"БульевыЧислa", new Regex("^[!0-9]+$")},
-                {"Буквы", new Regex("^[а-яА-Я]+$")},
-                {"Переменная", new Regex($"^[0-9а-яА-Я]+$")},
-                {"Скобки", new Regex(@"^\(.+\)$")},
+                {"Числa", new Regex(@"^\d+$")},
+                {"Операторы", new Regex("[&|*/+-]") },
+
+                {"БульевыЧислa", new Regex("[!01]+")},
+                {"БульевыЗнаки", new Regex("[!&|]")},
+                {"БулеваОперация", new Regex("[!&|01]+")},
 
                 {"ЯзыкНачало", new Regex("^Программа$")},
                 {"ЯзыкКонец", new Regex("^Конец программа$")},
-                {"Заголовок", new Regex($"^Метки( [0-9]+)+$")},
-                {"Операция", new Regex("^([0-9]+) : ([0-9а-яА-Я]+) = ([0-9()!&|+*/ -]+)$")},
-                {"ПравЧасть", new Regex("^([0-9()!&|+*/ -]+) ([!&|+*/-]) ([0-9()!&|+*/ -]+)$")},
-                {"ПравЧастьТочка", new Regex("^([0-9()!&|+*/, -]+) ([!&|+*/-]) ([0-9()!&|+*/, -]+)$")}
+                {"Заголовок", new Regex(@"^Метки( [\d]+)+$")},
+                {"Операция", new Regex(@"^([\d]+) : ([\dа-яА-Я]+) = ([\d()!&|+*/ -]+)$")},
+                {"ПраваяЧасть", new Regex(@"^([\d()!&|+*/,-]+)([&|+*/-])([\d()!&|+*/,-]+)$")},
+                {"ПраваяЧастьПростая", new Regex(@"^(-?\d+,?\d*?)(([+*/-])(-?\d+,?\d*?))+$")},
+                {"ПраваяЧастьБуль", new Regex(@"^(!?[0-1]+)(([|&])(!?[0-1]+))+$")}
             };
 
             _errorsDic = new Dictionary<string, string>()
@@ -88,7 +90,7 @@ namespace CodeTranslator
                 if (_variables.ContainsKey(groups[2].Value))
                     return "Такая переменная уже была объявлена ранее!";
 
-                if (_regexs["ПравЧастьТочка"].IsMatch(groups[3].Value))
+                if (_regexs["ПраваяЧасть"].IsMatch(groups[3].Value))
                     _variables.Add(groups[2].Value, double.Parse(ParseOperation(groups[3].Value)));
                 codeLineNum++;
             }
@@ -149,22 +151,95 @@ namespace CodeTranslator
 
         private void CheckBrackets(string text)
         {
+            var brackets = new[] { '(', ')' };
+            var operationType = _regexs["БульевыЗнаки"].IsMatch(text) ?
+                "ПраваяЧастьБуль" : "ПраваяЧастьПростая";
+
             if (text.Count(c => c == ')') != text.Count(c => c == '('))
                 throw new ArgumentException("Есть непарные скобки");
+
+            if (operationType == "ПраваяЧастьБуль")
+                if (!_regexs["БулеваОперация"].IsMatch(text))
+                    throw new Exception("Булева операция содержит недопустимые символы");
+
+            var openBracketCount = 0;
+            var lastBracketContent = new StringBuilder();
+            foreach (var chr in text)
+            {
+                if (brackets.Contains(chr))
+                {
+                    if (chr == '(')
+                    {
+                        openBracketCount++;
+                        if (lastBracketContent.Length != 0)
+                        {
+                            var lastSymbol = lastBracketContent.ToString().Last().ToString();
+                            if (lastSymbol == "(" || _regexs["Операторы"].IsMatch(lastSymbol))
+                                continue;
+
+                            if (_regexs["Числа"].IsMatch(lastSymbol))
+                                throw new Exception("Fuck you bracket operator!");
+                            if (lastSymbol == ")")
+                                throw new Exception("Fuck you close bracket!");
+                        }
+                    }
+                    else
+                    {
+                        if (openBracketCount == 0)
+                            throw new Exception("Close bracket without fking open bracket! Damn~");
+
+                        openBracketCount--;
+                        if (lastBracketContent.Length != 0)
+                        {
+                            var lastSymbol = lastBracketContent.ToString().Last().ToString();
+                            if (lastSymbol == ")" || _regexs["Числa"].IsMatch(lastSymbol))
+                                if (_regexs[operationType].IsMatch(lastBracketContent.ToString()))
+                                    continue;
+                                else throw new Exception("Fuck number-operator order!");
+
+                            if (lastSymbol == "(")
+                                throw new Exception("Fuck empty brackets!~");
+                            if (_regexs["Операторы"].IsMatch(lastSymbol))
+                                throw new Exception("Fuck operator before bracket!~");
+                        } else
+                            throw new Exception("Fuck first close bracket character!~");
+                    }
+                }
+                else
+                    lastBracketContent.Append(chr);
+            }
+
+            if (!_regexs[operationType].IsMatch(lastBracketContent.ToString()))
+                throw new Exception("Fuck number-operator order!");
         }
 
         private string PerformCalculation(string operation)
         {
+            var operType1 = new[] { "/", "*" };
+            var operType2 = new[] { "-", "+" };
+
             var opers = OperatorsArray(operation);
             while (opers.Length != 1)
             {
-                if (opers.Contains("/") || opers.Contains("*"))
+                if (opers.Count(c => operType1.Contains(c)) > 0)
                 {
-                    RecurciveReplacing(ref opers, new[] { "*", "/" });
+                    RecurciveReplacing(ref opers, operType1);
                 }
-                else
+                else if (opers.Count(c => operType2.Contains(c)) > 0)
                 {
-                    RecurciveReplacing(ref opers, new [] {"+", "-"});
+                    RecurciveReplacing(ref opers, operType2);
+                }
+                else if (opers.Count(c => c.StartsWith("!")) > 0)
+                {
+                    ReplaceBoolInversion(ref opers);
+                }
+                else if (opers.Contains("&"))
+                {
+                    RecurciveReplacing(ref opers, new[] { "&" });
+                }
+                else if (opers.Contains("|"))
+                {
+                    RecurciveReplacing(ref opers, new[] { "|" });
                 }
             }
             return opers[0];
@@ -172,7 +247,10 @@ namespace CodeTranslator
         
         private string[] OperatorsArray(string operation)
         {
-            var opersRegex = Regex.Match(operation, @"^(-?[0-9]+,?[0-9]*?)(([+*/-])(-?[0-9]+,?[0-9]*?))+$");
+            var operationType = _regexs["БульевыЗнаки"].IsMatch(operation) ?
+                "ПраваяЧастьБуль" : "ПраваяЧастьПростая";
+
+            var opersRegex = _regexs[operationType].Match(operation);
 
             var opers = new string[1];
             opers[0] = opersRegex.Groups[1].Value;
@@ -200,6 +278,13 @@ namespace CodeTranslator
                 opers = opersCopy;
                 break;
             }
+        }
+
+        public void ReplaceBoolInversion(ref string[] opers)
+        {
+            for (var i = 0; i < opers.Length; i++)
+                if (opers[i].StartsWith("!"))
+                    opers[i] = opers[i] == "!1" ? "0" : "1";
         }
 
         private double Calculate(string leftSide, string oper, string rightSide)
