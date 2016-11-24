@@ -14,34 +14,30 @@ namespace UnitTests
         [Test]
         public void SimpleCalculations()
         {
-            Assert.AreEqual(246, CallCalc("CalculateNumber", "123 + 123"));
-            Assert.AreEqual(81, CallCalc("CalculateNumber", "123 - 42"));
-            Assert.AreEqual(369, CallCalc("CalculateNumber", "123 * 3"));
-            Assert.AreEqual(61.5, CallCalc("CalculateNumber", "123 / 2"));
+            var translator = new Translator();
+            Assert.AreEqual(246, translator.PrivateMethod("CalculateNumber", "123 + 123"));
+            Assert.AreEqual(81, translator.PrivateMethod("CalculateNumber", "123 - 42"));
+            Assert.AreEqual(369, translator.PrivateMethod("CalculateNumber", "123 * 3"));
+            Assert.AreEqual(61.5, translator.PrivateMethod("CalculateNumber", "123 / 2"));
         }
 
         [Test]
         public void BooleanCalculation()
         {
-            Assert.AreEqual(1, CallCalc("CalculateNumber", "1 | 0"));
-            Assert.AreEqual(0, CallCalc("CalculateNumber", "!1 | 0"));
-            Assert.AreEqual(0, CallCalc("CalculateNumber", "1 & 0"));
-            Assert.AreEqual(1, CallCalc("CalculateNumber", "1 & 1"));
-            Assert.AreEqual(1, CallCalc("CalculateNumber", "1 & !0"));
+            var translator = new Translator();
+            Assert.AreEqual(1, translator.PrivateMethod("CalculateNumber", "1 | 0"));
+            Assert.AreEqual(0, translator.PrivateMethod("CalculateNumber", "!1 | 0"));
+            Assert.AreEqual(0, translator.PrivateMethod("CalculateNumber", "1 & 0"));
+            Assert.AreEqual(1, translator.PrivateMethod("CalculateNumber", "1 & 1"));
+            Assert.AreEqual(1, translator.PrivateMethod("CalculateNumber", "1 & !0"));
         }
 
         [Test]
         public void AlotOfBrackets()
         {
-            CallCalc("ParseOperation", "((12-43*(3-1)-10)-12)-34+34-(12/3)");
-        }
-
-        public object CallCalc(string method, params object[] text)
-        {
             var translator = new Translator();
-            var mi = translator.GetType().GetMethod(
-                "CalculateNumber", BindingFlags.NonPublic | BindingFlags.Instance);
-            return mi != null ? mi.Invoke(translator, text) : null;
+            translator.PrivateMethod("ParseOperation", "((12-43*(3-1)-10)-12)-34+34-(9/2)");
+            translator.PrivateMethod("ParseOperation", "((12-43*(3-1)-10)-12)-34+34-(8/2)");
         }
     }
 }

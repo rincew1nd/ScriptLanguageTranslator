@@ -144,7 +144,7 @@ namespace CodeTranslator
                 text = substring.ToString();
             }
 
-            return text;
+            return PerformCalculation(text);
         }
 
         private void CheckBrackets(string text)
@@ -172,7 +172,7 @@ namespace CodeTranslator
         
         private string[] OperatorsArray(string operation)
         {
-            var opersRegex = Regex.Match(operation, @"([0-9]+)(([+*/-])([0-9]+))+");
+            var opersRegex = Regex.Match(operation, @"^(-?[0-9]+,?[0-9]*?)(([+*/-])(-?[0-9]+,?[0-9]*?))+$");
 
             var opers = new string[1];
             opers[0] = opersRegex.Groups[1].Value;
