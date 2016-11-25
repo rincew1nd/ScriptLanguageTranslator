@@ -32,28 +32,28 @@
                     <Run Text="Метки 10 20 30 40 50 60 70"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="10 : йцук1 = 123+123"/>
+                    <Run Text="10 : йцук1 = 123+123;"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="20 : йцук2 = 123-123"/>
+                    <Run Text="20 : йцук2 = 123-123;"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="30 : йцук3 = 234/2"/>
+                    <Run Text="30 : йцук3 = 234/2;"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="40 : йцук4 = 234*2"/>
+                    <Run Text="40 : йцук4 = 234*2;"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="50 : йцук5 = (10+5)/(54+5)"/>
+                    <Run Text="50 : йцук5 = (10+5)/(54+5);"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="60 : йцук6 = ((10+5)/(54+5))/2"/>
+                    <Run Text="60 : йцук6 = ((10+5)/(54+5))/2;"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="70 : йцук7 = 1&amp;(0|1)"/>
+                    <Run Text="70 : йцук7 = 1&amp;(0|1);"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="70 : йцук8 = 1&amp;(0|!1)"/>
+                    <Run Text="70 : йцук8 = 1&amp;(0|!1);"/>
                 </Paragraph>
                 <Paragraph>
                     <Run Text="Конец программа"/>

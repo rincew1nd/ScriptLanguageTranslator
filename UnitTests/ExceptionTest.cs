@@ -104,28 +104,28 @@ namespace UnitTests
             var translator = new Translator();
             var text = "Программа\r\nМетки 1 2 3\r\n";
 
-            try { translator.CheckSyntax($"{text}10 :  тест = 123-123"); }
+            try { translator.CheckSyntax($"{text}10 :  тест = 123-123;"); }
             catch (SyntaxException ex)
             {
                 Assert.AreEqual(
-                    "Ошибка в строке 3. Неверное ключевое слово '10 :  тест = 123-123'." +
-                    " Ожидается: <Метка> \":\" <Перем> \"=\" <Прав.часть>",
+                    "Ошибка в строке 3. Неверное ключевое слово '10 :  тест = 123-123;'." +
+                    " Ожидается: <Метка> \":\" <Перем> \"=\" <Прав.часть>;",
                     ex.Message);
             }
-            try { translator.CheckSyntax($"{text}а10 : тест = 123-123"); }
+            try { translator.CheckSyntax($"{text}а10 : тест = 123-123;"); }
             catch (SyntaxException ex)
             {
                 Assert.AreEqual(
-                    "Ошибка в строке 3. Неверное ключевое слово 'а10 : тест = 123-123'." +
-                    " Ожидается: <Метка> \":\" <Перем> \"=\" <Прав.часть>",
+                    "Ошибка в строке 3. Неверное ключевое слово 'а10 : тест = 123-123;'." +
+                    " Ожидается: <Метка> \":\" <Перем> \"=\" <Прав.часть>;",
                     ex.Message);
             }
-            try { translator.CheckSyntax($"{text}10 : тест  = 123-123"); }
+            try { translator.CheckSyntax($"{text}10 : тест  = 123-123;"); }
             catch (SyntaxException ex)
             {
                 Assert.AreEqual(
-                    "Ошибка в строке 3. Неверное ключевое слово '10 : тест  = 123-123'." +
-                    " Ожидается: <Метка> \":\" <Перем> \"=\" <Прав.часть>",
+                    "Ошибка в строке 3. Неверное ключевое слово '10 : тест  = 123-123;'." +
+                    " Ожидается: <Метка> \":\" <Перем> \"=\" <Прав.часть>;",
                     ex.Message);
             }
         }
@@ -136,25 +136,25 @@ namespace UnitTests
             var translator = new Translator();
             var text = "Программа\r\nМетки 1 2 3\r\n10 : тест = ";
 
-            try { translator.CheckSyntax($"{text}12-(43-43)\\"); }
+            try { translator.CheckSyntax($"{text}12-(43-43)\\;"); }
             catch (SyntaxException ex)
             {
                 Assert.AreEqual(
-                    "Ошибка в строке 3. Правая часть содержит недопустимые символы\n'12-(43-43)\\'",
+                    "Ошибка в строке 3. Правая часть содержит недопустимые символы\n'12-(43-43)\\;'",
                     ex.Message);
             }
-            try { translator.CheckSyntax($"{text}12.34-434"); }
+            try { translator.CheckSyntax($"{text}12.34-434;"); }
             catch (SyntaxException ex)
             {
                 Assert.AreEqual(
-                    "Ошибка в строке 3. Правая часть содержит недопустимые символы\n'12.34-434'",
+                    "Ошибка в строке 3. Правая часть содержит недопустимые символы\n'12.34-434;'",
                     ex.Message);
             }
-            try { translator.CheckSyntax($"{text}124-43,4"); }
+            try { translator.CheckSyntax($"{text}124-43,4;"); }
             catch (SyntaxException ex)
             {
                 Assert.AreEqual(
-                    "Ошибка в строке 3. Правая часть содержит недопустимые символы\n'124-43,4'",
+                    "Ошибка в строке 3. Правая часть содержит недопустимые символы\n'124-43,4;'",
                     ex.Message);
             }
         }
@@ -163,7 +163,7 @@ namespace UnitTests
         public void UnknownMark()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n34 : тест = 324-43";
+            var text = "Программа\r\nМетки 1 2 3\r\n34 : тест = 324-43;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (SyntaxException ex)
@@ -178,7 +178,7 @@ namespace UnitTests
         public void UniqueMark()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 12 23 31\r\n12 : тест = 324-43\r\n12 : тест = 324-43";
+            var text = "Программа\r\nМетки 12 23 31\r\n12 : тест = 324-43;\r\n12 : тест = 324-43;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (SyntaxException ex)
@@ -193,9 +193,9 @@ namespace UnitTests
         public void SameVariable()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 324-43";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 324-43;";
 
-            try { translator.CheckSyntax($"{text}\r\n2 : тест = 324-413"); }
+            try { translator.CheckSyntax($"{text}\r\n2 : тест = 324-413;"); }
             catch (SyntaxException ex)
             {
                 Assert.AreEqual(
@@ -222,7 +222,7 @@ namespace UnitTests
         [Test]
         public void ProgramEndSyntax()
         {
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 324-43\r\n";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 324-43;\r\n";
 
             var translator = new Translator();
             try { translator.CheckSyntax($"{text}Конец программа1"); }
@@ -262,7 +262,7 @@ namespace UnitTests
         public void NotPairedBrackets()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = ((324-43)";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = ((324-43);";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (OredrException ex)
@@ -277,7 +277,7 @@ namespace UnitTests
         public void BoolNotBool()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = ((324-43)|1)&1";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = ((324-43)|1)&1;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (OredrException ex)
@@ -292,7 +292,7 @@ namespace UnitTests
         public void NumberBeforeOpenBrackets()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = ((324-43)-43(3*2))-2";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = ((324-43)-43(3*2))-2;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (OredrException ex)
@@ -308,7 +308,7 @@ namespace UnitTests
         public void CloseBracketBeforeOpenBrackets()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 12-((2*3)(3*2))-2";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 12-((2*3)(3*2))-2;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (OredrException ex)
@@ -324,7 +324,7 @@ namespace UnitTests
         public void OpenBracketsBeforeCloseBracket()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 12-((2*3)-()(3*2))-2";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 12-((2*3)-()(3*2))-2;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (OredrException ex)
@@ -339,7 +339,7 @@ namespace UnitTests
         public void LineStartFromCloseBracket()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = )12-((2*3)-((3*2))-2";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = )12-((2*3)-((3*2))-2;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (OredrException ex)
@@ -354,7 +354,7 @@ namespace UnitTests
         public void CloseBracketWithoutOpen()
         {
             var translator = new Translator();
-            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 2*3)-(3*2)-2(";
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = 2*3)-(3*2)-2(;";
 
             try { translator.CheckSyntax($"{text}"); }
             catch (OredrException ex)
