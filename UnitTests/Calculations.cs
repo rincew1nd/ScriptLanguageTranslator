@@ -9,27 +9,27 @@ using NUnit.Framework;
 
 namespace UnitTests
 {
-    public class TestSuite
+    class CalculationTest
     {
         [Test]
         public void SimpleCalculations()
         {
             var translator = new Translator();
-            Assert.AreEqual(246, translator.PrivateMethod("CalculateNumber", "123 + 123"));
-            Assert.AreEqual(81, translator.PrivateMethod("CalculateNumber", "123 - 42"));
-            Assert.AreEqual(369, translator.PrivateMethod("CalculateNumber", "123 * 3"));
-            Assert.AreEqual(61.5, translator.PrivateMethod("CalculateNumber", "123 / 2"));
+            Assert.AreEqual("246", translator.PrivateMethod("ParseOperation", "123+123"));
+            Assert.AreEqual("81", translator.PrivateMethod("ParseOperation", "123-42"));
+            Assert.AreEqual("369", translator.PrivateMethod("ParseOperation", "123*3"));
+            Assert.AreEqual("61,5", translator.PrivateMethod("ParseOperation", "123/2"));
         }
 
         [Test]
         public void BooleanCalculation()
         {
             var translator = new Translator();
-            Assert.AreEqual(1, translator.PrivateMethod("CalculateNumber", "1 | 0"));
-            Assert.AreEqual(0, translator.PrivateMethod("CalculateNumber", "!1 | 0"));
-            Assert.AreEqual(0, translator.PrivateMethod("CalculateNumber", "1 & 0"));
-            Assert.AreEqual(1, translator.PrivateMethod("CalculateNumber", "1 & 1"));
-            Assert.AreEqual(1, translator.PrivateMethod("CalculateNumber", "1 & !0"));
+            Assert.AreEqual("1", translator.PrivateMethod("ParseOperation", "1|0"));
+            Assert.AreEqual("0", translator.PrivateMethod("ParseOperation", "!1|0"));
+            Assert.AreEqual("0", translator.PrivateMethod("ParseOperation", "1&0"));
+            Assert.AreEqual("1", translator.PrivateMethod("ParseOperation", "1&1"));
+            Assert.AreEqual("1", translator.PrivateMethod("ParseOperation", "1&!0"));
         }
 
         [Test]

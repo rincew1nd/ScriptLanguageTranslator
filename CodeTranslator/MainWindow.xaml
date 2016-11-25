@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CodeTranslator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="764" Width="800" Visibility="Visible" WindowStyle="None" Padding="0" Margin="0">
+        Title="MainWindow" Height="784" Width="1200" Visibility="Visible" WindowStyle="ToolWindow" Padding="0" Margin="0">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -16,12 +16,12 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Content="Код"/>
-        <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Content="Формула Бекуса-Наура"/>
+        <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Content="Форма Бекуса-Наура"/>
         <Label Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Content="Результат выполнения"/>
         <RichTextBox Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" FontSize="16" Block.LineHeight="1" Name="CodeBox">
             <FlowDocument>
@@ -47,14 +47,91 @@
                     <Run Text="50 : йцук5 = (10+5)/(54+5)"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run Text="60 : йцук6 = ((10+5)/(54+5))/0.2"/>
+                    <Run Text="60 : йцук6 = ((10+5)/(54+5))/2"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="70 : йцук7 = 1&amp;(0|1)"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="70 : йцук8 = 1&amp;(0|!1)"/>
                 </Paragraph>
                 <Paragraph>
                     <Run Text="Конец программа"/>
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
-        <RichTextBox Grid.Row="1" Grid.Column="1" FontSize="16" Block.LineHeight="1" Name="BnfBox"/>
+        <RichTextBox Grid.Row="1" Grid.Column="1" FontSize="16" Block.LineHeight="1" Name="BnfBox">
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text="«Язык» = 'Программа' «Заголовок» «Опер» ';' ... «Опер» 'Конец программа'"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Заголовок» = «Метки» «Знак» ... «Знак»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Метка» = «Числа»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Опер» = «Метка» ':' «Перем» '=' «Прав.часть»';"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Прав.часть» = «Блок» «Знак» ... «Блок»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Блок» = «БлокОбычный» ! «БлокБульевый»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«БлокОбычный» = «Числа»«Знаки»«Числа» ! '('«БлокОбычный»')' ! 
+                         «БлокОбычный»«Знаки»«БлокОбычный» ! «Числа»«Знаки»«БлокОбычный»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«БлокБулевый» = «БулевыЧисла»«БульевыЗнаки»«БулевыЧисла» ! '('«БлокБулевый»')' ! 
+                         «БлокБулевый»«БульевыЗнаки»«БлокБулевый» ! «БулевыЧисла»«БульевыЗнаки»«БлокБулевый»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Операторы» = «БульевыЗнаки» ! «Знаки»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Знаки» = '+'!'-'!'*'!'/'"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«БульевыЗнаки» = '|'!'&amp;'"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«БулевыЧисла» = '0'!'1'"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Числа» = «Число» ... «Число»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Число» = '0'!'1'!'2'!...!'9'"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Буквы» = «Буква» ... «Буква»"/>
+                </Paragraph>
+                <Paragraph>
+                    <Run Text="«Буква» = 'A'!'Б'!'В'!...!'Я'"/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
         <DataGrid Grid.Row="3" Grid.Column="1" Name="ResultBox" FontSize="16"
                    ItemsSource="{Binding Results}" AutoGenerateColumns="False">
             <DataGrid.Columns >

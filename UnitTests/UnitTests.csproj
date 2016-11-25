@@ -47,7 +47,7 @@
   <ItemGroup>
     <Compile Include="Calculations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Syntax.cs" />
+    <Compile Include="ExceptionTest.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

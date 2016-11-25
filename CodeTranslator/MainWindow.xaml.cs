@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CodeTranslator.Exceptions;
 
 namespace CodeTranslator
 {
@@ -33,8 +34,13 @@ namespace CodeTranslator
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            ErrorBox.Content = "";
             var codeBoxText = new TextRange(CodeBox.Document.ContentStart, CodeBox.Document.ContentEnd).Text;
-            ErrorBox.Content = _translator.CheckSyntax(codeBoxText);
+            try { _translator.CheckSyntax(codeBoxText); }
+            catch (Exception ex) when (ex is SyntaxException | ex is OredrException)
+            {
+                ErrorBox.Content = ex.Message;
+            }
             if ((string) ErrorBox.Content == "")
             {
                 Results.Clear();
