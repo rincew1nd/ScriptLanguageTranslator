@@ -20,6 +20,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using CodeTranslator.Exceptions;
 
 namespace CodeTranslator
@@ -80,6 +81,7 @@ namespace CodeTranslator
                            $" Нужен соединяющий оператор\n{kostil}" },
                 {")(", $"{exceptionBase} Закрывающая скобка не может идти после открывающей скобки." +
                        $" Нужен соединяющий оператор\n{kostil}" },
+                {"-(", $"{exceptionBase} Отрицательня скобка в строке\n{kostil}" },
                 {"()", $"{exceptionBase} Скобки ничего не содержат\n{kostil}" },
                 {"Знак)", $"{exceptionBase} Знак не может соединять закрывающую скобку\n{kostil}" },
                 {"^)", $"{exceptionBase} Закрывающая скобка как начало правой части\n{kostil}" },
@@ -208,6 +210,7 @@ namespace CodeTranslator
         private void CheckBrackets(string text)
         {
             var brackets = new[] { '(', ')' };
+            var operators = new[] { '&', '|', '*', '/', '+', '-' };
             var operationType = _regexs["БульевыЗнаки"].IsMatch(text) ?
                 "ПраваяЧастьБуль" : "ПраваяЧастьПростая";
 
@@ -223,31 +226,39 @@ namespace CodeTranslator
 
             var i = 0;
             var lastSymbol = "";
+            var secondOperatorInaRow = false;
             var openBracketCount = 0;
             var lastBracketContent = new StringBuilder();
             foreach (var chr in text)
             {
                 i++;
-                if (brackets.Contains(chr))
+                if (brackets.Contains(chr) || operators.Contains(chr))
                 {
                     if (chr == '(')
                     {
                         openBracketCount++;
                         if (lastBracketContent.Length != 0)
                         {
+                            if (lastSymbol == "-" && (
+                                secondOperatorInaRow || (
+                                    i-3 >= 0 && text[i-3] == '(')
+                                ))
+                                throw new OredrException(_errorsDic["-("], _currentLine + 1, text.Substring(0, i));
+
                             if (lastSymbol == "(" || _regexs["Операторы"].IsMatch(lastSymbol))
                             {
-                                lastSymbol = "(";
+                                lastSymbol = chr.ToString();
                                 continue;
                             }
-
+                            
                             if (_regexs["Числа"].IsMatch(lastSymbol))
                                 throw new OredrException(_errorsDic["Цифра("], _currentLine + 1, text.Substring(0, i));
                             if (lastSymbol == ")")
                                 throw new OredrException(_errorsDic[")("], _currentLine + 1, text.Substring(0, i));
                         }
+                        lastSymbol = chr.ToString();
                     }
-                    else
+                    else if (chr == ')')
                     {
                         if (openBracketCount == 0 && i == 1)
                             throw new OredrException(_errorsDic["^)"], _currentLine + 1, text);
@@ -273,7 +284,14 @@ namespace CodeTranslator
                         else
                             throw new OredrException(_errorsDic["^)"], _currentLine + 1, text);
 
-                        lastSymbol = ")";
+                        lastSymbol = chr.ToString();
+                    } else if (operators.Contains(chr))
+                    {
+                        if (operators.Contains(lastSymbol[0]))
+                            secondOperatorInaRow = true;
+                        lastBracketContent.Append(chr);
+                        lastSymbol = chr.ToString();
+                        continue;
                     }
                 }
                 else
@@ -281,6 +299,7 @@ namespace CodeTranslator
                     lastSymbol = chr.ToString();
                     lastBracketContent.Append(chr);
                 }
+                secondOperatorInaRow = false;
             }
 
             if (!_regexs[operationType].IsMatch(lastBracketContent.ToString()))
@@ -315,8 +334,16 @@ namespace CodeTranslator
                 {
                     RecurciveReplacing(ref opers, new[] { "|" });
                 }
+                else if (opers.Length == 1 && opers[0] == "")
+                {
+                    opers[0] = operation;
+                }
             }
-            return opers[0];
+
+            if (opers.Length == 1 && opers[0] == "")
+                return operation;
+            else
+                return opers[0];
         }
 
         private string[] OperatorsArray(string operation)

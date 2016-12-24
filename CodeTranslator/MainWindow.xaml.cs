@@ -22,6 +22,10 @@ namespace CodeTranslator
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static RichTextBox Textbox;
+        public static TextPointer LastErrorStart;
+        public static TextPointer LastErrorEnd;
+
         public Translator _translator;
         public ObservableCollection<KeyValuePair<string, double>> Results { get; set; }
 
@@ -30,10 +34,12 @@ namespace CodeTranslator
             InitializeComponent();
             _translator = new Translator();
             Results = new ObservableCollection<KeyValuePair<string, double>>();
+            Textbox = CodeBox;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            Utils.DeselectText();
             ErrorBox.Content = "";
             var codeBoxText = new TextRange(CodeBox.Document.ContentStart, CodeBox.Document.ContentEnd).Text;
             try { _translator.CheckSyntax(codeBoxText); }

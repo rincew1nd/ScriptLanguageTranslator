@@ -365,6 +365,20 @@ namespace UnitTests
             }
         }
 
+        [Test]
+        public void WeirdCase()
+        {
+            var translator = new Translator();
+            var text = "Программа\r\nМетки 1 2 3\r\n1 : тест = (-(2*3));";
+
+            try { translator.CheckSyntax($"{text}"); }
+            catch (OredrException ex)
+            {
+                Assert.AreEqual(
+                    "Ошибка в строке 3. Отрицательня скобка в строке\n'(-('",
+                    ex.Message);
+            }
+        }
         #endregion
     }
 }
